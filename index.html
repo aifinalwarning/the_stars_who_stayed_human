@@ -2645,80 +2645,224 @@
           });
           
           STATE.entries.push(entry);
-          STATE.truthPoints += 30;
-          await persistSoft();
-          render();
-          
-          ev.target.reset();
-          updateSovTotal();
-          alert("Band entry added successfully! +30 Truth Points");
-        });
-        
-        // Import functionality
-        document.getElementById("btnMergeImport").addEventListener("click", async ()=>{
-          const file = document.getElementById("importFile").files[0];
-          if (!file) {
-            alert("Please select a JSON file first.");
-            return;
-          }
-          
-          const txt = await file.text();
-          const pack = parseImport(txt);
-          if (!pack) {
-            alert("Invalid file format. Please select a valid JSON export.");
-            return;
-          }
-          
-          await mergeImport(pack);
-          alert(`Merged ${pack.entries.length} band entries successfully!`);
-          document.getElementById("importFile").value = "";
-        });
-        
-        document.getElementById("btnReplaceImport").addEventListener("click", async ()=>{
-          const file = document.getElementById("importFile").files[0];
-          if (!file) {
-            alert("Please select a JSON file first.");
-            return;
-          }
-          
-          if (!confirm("Replace ALL local data with imported file? This cannot be undone.")) {
-            return;
-          }
-          
-          const txt = await file.text();
-          const pack = parseImport(txt);
-          if (!pack) {
-            alert("Invalid file format. Please select a valid JSON export.");
-            return;
-          }
-          
-          await replaceImport(pack);
-          alert("Data replaced successfully!");
-          document.getElementById("importFile").value = "";
-        });
-        
-        // Initial render
-        splashMsg.textContent = "Finalizing...";
-        render();
-        
-        // Hide splash
-        setTimeout(()=>{
-          splash.classList.add("hidden");
-          setTimeout(()=>splash.remove(), 500);
-        }, 1200);
-        
-      } catch (err) {
-        console.error("Boot error:", err);
-        splashMsg.textContent = "Error loading data. Check console.";
-      }
-    }
+async function boot(){
+  setupParallax();
+  createParticles();
 
-    // Initialize on DOM ready
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", boot);
+  const splash = document.getElementById("splash");
+  const splashMsg = document.getElementById("splashMsg");
+  
+  let bootSuccessful = false;
+  
+  try {
+    splashMsg.textContent = "Loading local data from IndexedDB...";
+    
+    // Load persisted data
+    const savedEntries = await DB.get(KEYS.ENTRIES);
+    const savedTP = await DB.get(KEYS.TP);
+    const savedQuest = await DB.get(KEYS.QUEST);
+    const hudMin = await DB.get(KEYS.HUDMIN);
+    
+    splashMsg.textContent = "Validating dataset and sovereignty scores...";
+    
+    if (Array.isArray(savedEntries) && savedEntries.length > 0) {
+      STATE.entries = savedEntries.map(normalizeEntry);
     } else {
-      boot();
+      STATE.entries = SEED.map(normalizeEntry);
     }
+    
+    STATE.truthPoints = Number(savedTP) || 0;
+    STATE.quest = savedQuest || null;
+    
+    if (hudMin) {
+      document.getElementById("hud").classList.add("minimized");
+    }
+    
+    splashMsg.textContent = "Rendering interface and calculating metrics...";
+    
+    // Wire up UI events
+    document.getElementById("q").addEventListener("input", (ev)=>{
+      setFilter({ q: ev.target.value });
+    });
+    
+    document.getElementById("btnOnlyVerified").addEventListener("click", ()=>{
+      setFilter({ verifiedOnly: true, partialOnly: false, highSovOnly: false });
+    });
+    
+    document.getElementById("btnOnlyPartial").addEventListener("click", ()=>{
+      setFilter({ verifiedOnly: false, partialOnly: true, highSovOnly: false });
+    });
+    
+    document.getElementById("btnHighSov").addEventListener("click", ()=>{
+      setFilter({ verifiedOnly: false, partialOnly: false, highSovOnly: true });
+    });
+    
+    document.getElementById("btnClearFilters").addEventListener("click", ()=>{
+      document.getElementById("q").value = "";
+      setFilter({ verifiedOnly: false, partialOnly: false, highSovOnly: false, q: "" });
+    });
+    
+    document.getElementById("btnExport").addEventListener("click", exportJSON);
+    
+    document.getElementById("btnReset").addEventListener("click", async ()=>{
+      if (!confirm("Reset all local data? This will restore the seed dataset and clear your additions.")) return;
+      STATE.entries = SEED.map(normalizeEntry);
+      STATE.truthPoints = 0;
+      STATE.quest = null;
+      await DB.del(KEYS.ENTRIES);
+      await DB.del(KEYS.TP);
+      await DB.del(KEYS.QUEST);
+      render();
+    });
+    
+    document.getElementById("btnQuest").addEventListener("click", newQuest);
+    
+    document.getElementById("btnHudHelp").addEventListener("click", ()=>{
+      alert("HUD Metrics:\n\n" +
+            "Truth Points: Earned by adding verified bands, sources, member data, and sovereignty info.\n\n" +
+            "Verified/Partial: Entry verification status. Verified = all members documented with recent sources. Partial = core members verified.\n\n" +
+            "Sources: Total reputable source links across all entries.\n\n" +
+            "Constellation: Visual representation of dataset. Node colors reflect sovereignty levels:\n" +
+            "- Green: High sovereignty (75+)\n" +
+            "- Orange: Medium sovereignty (50-74)\n" +
+            "- Blue: Developing sovereignty (0-49)\n\n" +
+            "Node size reflects verification level (larger = more verified).\n\n" +
+            "Micro-Quests suggest quality improvements for dataset enhancement.");
+    });
+    
+    const hudMinBtn = document.getElementById("hudMin");
+    hudMinBtn.addEventListener("click", async ()=>{
+      const hud = document.getElementById("hud");
+      hud.classList.toggle("minimized");
+      await DB.set(KEYS.HUDMIN, hud.classList.contains("minimized"));
+    });
+    
+    // Add form sovereignty sliders
+    ["Creative", "Financial", "Distribution", "Narrative"].forEach(type => {
+      const el = document.getElementById(`addSov${type}`);
+      if (el) el.addEventListener("input", updateSovTotal);
+    });
+    
+    // Add form submission
+    document.getElementById("addForm").addEventListener("submit", async (ev)=>{
+      ev.preventDefault();
+      
+      if (!Safe.rate("addEntry", 1000)) {
+        alert("Please wait a moment before adding another entry.");
+        return;
+      }
+      
+      const band = document.getElementById("addBand").value;
+      const since = document.getElementById("addSince").value;
+      const verification = document.getElementById("addVerification").value;
+      const tagsRaw = document.getElementById("addTags").value;
+      const membersRaw = document.getElementById("addMembers").value;
+      const sourcesRaw = document.getElementById("addSources").value;
+      const note = document.getElementById("addNote").value;
+      
+      const sovCreative = Number(document.getElementById("addSovCreative").value);
+      const sovFinancial = Number(document.getElementById("addSovFinancial").value);
+      const sovDistribution = Number(document.getElementById("addSovDistribution").value);
+      const sovNarrative = Number(document.getElementById("addSovNarrative").value);
+      
+      const tags = tagsRaw.split(",").map(t=>t.trim().toLowerCase()).filter(Boolean);
+      const members = parseMemberList(membersRaw);
+      const sources = sourcesRaw.split("\n").map(u=>u.trim()).filter(Boolean);
+      
+      const entry = normalizeEntry({
+        id: `custom-${Date.now()}`,
+        band,
+        since: Number(since),
+        status: "active",
+        verification,
+        tags,
+        members,
+        sources,
+        note,
+        sovereignty: {
+          creative: sovCreative,
+          financial: sovFinancial,
+          distribution: sovDistribution,
+          narrative: sovNarrative,
+          description: ""
+        }
+      });
+      
+      STATE.entries.push(entry);
+      STATE.truthPoints += 30;
+      await persistSoft();
+      render();
+      
+      ev.target.reset();
+      updateSovTotal();
+      alert("Band entry added successfully! +30 Truth Points");
+    });
+    
+    // Import functionality
+    document.getElementById("btnMergeImport").addEventListener("click", async ()=>{
+      const file = document.getElementById("importFile").files[0];
+      if (!file) {
+        alert("Please select a JSON file first.");
+        return;
+      }
+      
+      const txt = await file.text();
+      const pack = parseImport(txt);
+      if (!pack) {
+        alert("Invalid file format. Please select a valid JSON export.");
+        return;
+      }
+      
+      await mergeImport(pack);
+      alert(`Merged ${pack.entries.length} band entries successfully!`);
+      document.getElementById("importFile").value = "";
+    });
+    
+    document.getElementById("btnReplaceImport").addEventListener("click", async ()=>{
+      const file = document.getElementById("importFile").files[0];
+      if (!file) {
+        alert("Please select a JSON file first.");
+        return;
+      }
+      
+      if (!confirm("Replace ALL local data with imported file? This cannot be undone.")) {
+        return;
+      }
+      
+      const txt = await file.text();
+      const pack = parseImport(txt);
+      if (!pack) {
+        alert("Invalid file format. Please select a valid JSON export.");
+        return;
+      }
+      
+      await replaceImport(pack);
+      alert("Data replaced successfully!");
+      document.getElementById("importFile").value = "";
+    });
+    
+    // Initial render
+    splashMsg.textContent = "Finalizing...";
+    render();
+    
+    // Mark boot as successful
+    bootSuccessful = true;
+    
+  } catch (err) {
+    console.error("Boot error:", err);
+    splashMsg.textContent = "Error loading data. Check console for details.";
+  } finally {
+    // Always hide splash regardless of success or failure
+    setTimeout(()=>{
+      splash.classList.add("hidden");
+      setTimeout(()=>{
+        if (splash.parentNode) {
+          splash.remove();
+        }
+      }, 500);
+    }, bootSuccessful ? 800 : 2000); // Show error message longer if boot failed
+  }
+}
   </script>
 </body>
 </html>
