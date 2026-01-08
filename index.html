@@ -1,0 +1,2724 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <title>Band Commitment Index — Complete Band Relationship Stability + Sovereignty</title>
+  <style>
+    /* =========================
+       CORE DESIGN SYSTEM
+       Enhanced with sovereignty scoring and band-level commitment tracking
+    ========================== */
+    :root{
+      --bg:#0a0c10;
+      --panel:#121724ee;
+      --panel2:#0f1420dd;
+      --text:#e9eefc;
+      --muted:#a9b3d6;
+      --faint:#6b7393;
+      --accent:#7dd3fc;
+      --accent2:#c4b5fd;
+      --good:#86efac;
+      --warn:#fde68a;
+      --bad:#fca5a5;
+      --line:#223056;
+      --shadow: 0 15px 50px rgba(0,0,0,.4), 0 5px 20px rgba(0,0,0,.2);
+      --glow: 0 0 20px rgba(125,211,252,.15);
+      --radius: 20px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      --max: 1200px;
+      
+      /* Sovereignty colors */
+      --sov-high:#10b981;
+      --sov-med:#f59e0b;
+      --sov-low:#ef4444;
+      --sov-grad: linear-gradient(135deg, var(--sov-high), var(--sov-med), var(--sov-low));
+    }
+    
+    html,body{height:100%;}
+    body{
+      margin:0;
+      background: 
+        radial-gradient(1400px 900px at 10% 15%, rgba(16,185,129,.12), transparent 60%),
+        radial-gradient(1200px 800px at 90% 20%, rgba(139,92,246,.15), transparent 55%),
+        radial-gradient(1000px 700px at 50% 85%, rgba(14,165,233,.10), transparent 65%),
+        linear-gradient(180deg, #0a0c10 0%, #050608 100%);
+      color:var(--text);
+      font-family:var(--sans);
+      overflow-x:hidden;
+      position:relative;
+    }
+    
+    /* Animated background particles */
+    @keyframes float{
+      0%, 100%{transform: translate3d(0,0,0) rotate(0deg);}
+      25%{transform: translate3d(10px, -10px, 0) rotate(5deg);}
+      50%{transform: translate3d(-5px, -20px, 0) rotate(-3deg);}
+      75%{transform: translate3d(-10px, -5px, 0) rotate(3deg);}
+    }
+    
+    @keyframes glow{
+      0%, 100%{opacity:.3; transform:scale(1);}
+      50%{opacity:.6; transform:scale(1.05);}
+    }
+    
+    .particles{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:0;
+      overflow:hidden;
+    }
+    
+    .particle{
+      position:absolute;
+      width:4px;
+      height:4px;
+      background: radial-gradient(circle, rgba(125,211,252,.6), transparent);
+      border-radius:50%;
+      animation: float 20s infinite ease-in-out;
+    }
+    
+    a{color:var(--accent); text-decoration:none; transition: all .2s ease;}
+    a:hover{text-decoration:underline; color:var(--accent2);}
+    
+    .wrap{max-width:var(--max); margin:0 auto; padding:20px; position:relative; z-index:1;}
+    
+    .card{
+      background: linear-gradient(135deg, rgba(18,23,36,.95), rgba(10,12,18,.90));
+      border:1px solid rgba(125,211,252,.2);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      backdrop-filter: blur(20px);
+      position:relative;
+      overflow:hidden;
+    }
+    
+    .card::before{
+      content:'';
+      position:absolute;
+      top:0;
+      left:0;
+      right:0;
+      height:1px;
+      background: linear-gradient(90deg, transparent, rgba(125,211,252,.4), transparent);
+    }
+    
+    .row{display:flex; gap:14px; flex-wrap:wrap; align-items:center;}
+    
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 14px; border-radius:999px;
+      border:1px solid rgba(125,211,252,.25);
+      background: rgba(18,23,36,.6);
+      color:var(--muted);
+      font-size:13px;
+      user-select:none;
+      transition: all .2s ease;
+      backdrop-filter: blur(10px);
+    }
+    .pill:hover{
+      border-color: rgba(125,211,252,.5);
+      background: rgba(18,23,36,.8);
+    }
+    .pill b{color:var(--text); font-weight:700;}
+    
+    .kbd{
+      font-family:var(--mono);
+      font-size:12px;
+      padding:3px 8px;
+      border:1px solid rgba(125,211,252,.3);
+      border-radius:8px;
+      background: rgba(0,0,0,.35);
+      color:var(--text);
+      box-shadow: 0 2px 4px rgba(0,0,0,.2);
+    }
+
+    /* =========================
+       STICKY NAVIGATION WITH ENHANCED VISUALS
+    ========================== */
+    .toc{
+      position:sticky; top:15px; z-index:100;
+      display:flex; flex-wrap:wrap; gap:12px;
+      padding:14px 16px;
+      border-radius:var(--radius);
+      border:1px solid rgba(125,211,252,.25);
+      background: rgba(10,12,18,.90);
+      backdrop-filter: blur(30px);
+      box-shadow: var(--shadow);
+    }
+    
+    .toc::after{
+      content:'';
+      position:absolute;
+      inset:-1px;
+      border-radius:var(--radius);
+      padding:1px;
+      background: linear-gradient(135deg, rgba(125,211,252,.3), rgba(196,181,253,.3));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events:none;
+    }
+    
+    .toc .left{display:flex; flex-wrap:wrap; gap:10px; align-items:center;}
+    .toc .right{margin-left:auto; display:flex; gap:10px; align-items:center; flex-wrap:wrap;}
+    
+    .btn{
+      appearance:none; 
+      border:1px solid rgba(125,211,252,.3);
+      background: linear-gradient(135deg, rgba(18,23,36,.7), rgba(10,12,18,.7));
+      color:var(--text);
+      padding:10px 16px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:600;
+      transition: all .2s ease;
+      position:relative;
+      overflow:hidden;
+    }
+    
+    .btn::before{
+      content:'';
+      position:absolute;
+      inset:0;
+      background: linear-gradient(135deg, rgba(125,211,252,.15), transparent);
+      opacity:0;
+      transition: opacity .2s ease;
+    }
+    
+    .btn:hover{
+      filter:brightness(1.15);
+      box-shadow: 0 5px 15px rgba(125,211,252,.2);
+      transform: translateY(-1px);
+    }
+    .btn:hover::before{opacity:1;}
+    .btn:active{transform: translateY(0);}
+    .btn.small{padding:8px 12px; font-size:13px;}
+    .btn.good{border-color: rgba(16,185,129,.5); background: linear-gradient(135deg, rgba(16,185,129,.2), rgba(5,150,105,.15));}
+    .btn.warn{border-color: rgba(245,158,11,.5); background: linear-gradient(135deg, rgba(245,158,11,.2), rgba(217,119,6,.15));}
+    .btn.bad{border-color: rgba(239,68,68,.5); background: linear-gradient(135deg, rgba(239,68,68,.2), rgba(220,38,38,.15));}
+    
+    .input{
+      width:min(450px, 70vw);
+      padding:11px 14px;
+      border-radius:12px;
+      border:1px solid rgba(125,211,252,.3);
+      background: rgba(0,0,0,.35);
+      color:var(--text);
+      outline:none;
+      transition: all .2s ease;
+      backdrop-filter: blur(10px);
+    }
+    .input:focus{
+      border-color: rgba(125,211,252,.6); 
+      box-shadow: 0 0 0 4px rgba(125,211,252,.1), 0 5px 15px rgba(125,211,252,.15);
+      background: rgba(0,0,0,.45);
+    }
+    .input::placeholder{color:var(--faint);}
+
+    /* =========================
+       HERO SECTION WITH ADVANCED PARALLAX
+    ========================== */
+    .hero{
+      position:relative;
+      padding:40px 24px;
+      overflow:hidden;
+      min-height:300px;
+      display:flex;
+      align-items:center;
+    }
+    
+    .hero h1{
+      margin:0; 
+      font-size: clamp(32px, 4vw, 56px); 
+      letter-spacing:-.03em;
+      background: linear-gradient(135deg, var(--text), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: glow 4s infinite ease-in-out;
+    }
+    
+    .hero p{
+      margin:14px 0 0; 
+      color:var(--muted); 
+      line-height:1.6; 
+      font-size:16px;
+      max-width:800px;
+    }
+    
+    .hero .subgrid{
+      margin-top:20px; 
+      display:grid; 
+      grid-template-columns: 1fr; 
+      gap:14px;
+    }
+    
+    .parallax{
+      position:absolute; 
+      inset:-60px;
+      pointer-events:none;
+      opacity:.6;
+      z-index:0;
+    }
+    
+    .layer{
+      position:absolute; 
+      inset:0;
+      transform: translate3d(0,0,0);
+      filter: blur(.3px);
+    }
+    .layer svg{width:100%; height:100%;}
+    .layer .glow{opacity:.6;}
+    .layer .thin{opacity:.4;}
+    .heroContent{position:relative; z-index:2;}
+
+    /* =========================
+       SOVEREIGNTY DISPLAY SYSTEM
+    ========================== */
+    .sovereignty{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      padding:16px;
+      border-radius:14px;
+      background: linear-gradient(135deg, rgba(16,185,129,.08), rgba(139,92,246,.08));
+      border:1px solid rgba(16,185,129,.25);
+      margin-top:12px;
+    }
+    
+    .sovHeader{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    
+    .sovTitle{
+      font-weight:800;
+      font-size:14px;
+      color:var(--good);
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    
+    .sovBadge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:6px 12px;
+      border-radius:999px;
+      font-weight:700;
+      font-size:22px;
+      background: var(--sov-grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      border:1px solid rgba(16,185,129,.4);
+      box-shadow: 0 0 20px rgba(16,185,129,.2);
+    }
+    
+    .sovGrid{
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap:10px;
+    }
+    
+    .sovMetric{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      padding:10px;
+      border-radius:10px;
+      background: rgba(0,0,0,.25);
+      border:1px solid rgba(125,211,252,.15);
+    }
+    
+    .sovMetricLabel{
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+      color:var(--faint);
+      font-weight:600;
+    }
+    
+    .sovMetricValue{
+      font-size:20px;
+      font-weight:800;
+      color:var(--good);
+    }
+    
+    .sovBar{
+      height:6px;
+      background: rgba(0,0,0,.35);
+      border-radius:999px;
+      overflow:hidden;
+      position:relative;
+    }
+    
+    .sovBar::after{
+      content:'';
+      position:absolute;
+      left:0;
+      top:0;
+      bottom:0;
+      width: var(--sov-percent);
+      background: linear-gradient(90deg, var(--sov-high), var(--sov-med));
+      border-radius:999px;
+      box-shadow: 0 0 10px currentColor;
+    }
+    
+    .sovLevel{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:4px 10px;
+      border-radius:999px;
+      font-size:11px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+    }
+    
+    .sovLevel.high{
+      background: rgba(16,185,129,.2);
+      color:var(--sov-high);
+      border:1px solid rgba(16,185,129,.4);
+    }
+    
+    .sovLevel.med{
+      background: rgba(245,158,11,.2);
+      color:var(--sov-med);
+      border:1px solid rgba(245,158,11,.4);
+    }
+    
+    .sovLevel.low{
+      background: rgba(239,68,68,.2);
+      color:var(--sov-low);
+      border:1px solid rgba(239,68,68,.4);
+    }
+    
+    .sovDescription{
+      font-size:13px;
+      color:var(--muted);
+      line-height:1.5;
+      margin-top:8px;
+    }
+    
+    /* =========================
+       MEMBER RELATIONSHIP DISPLAY
+    ========================== */
+    .memberList{
+      margin-top:12px;
+      padding:12px;
+      border-radius:12px;
+      background: rgba(0,0,0,.25);
+      border:1px solid rgba(125,211,252,.15);
+    }
+    
+    .memberList h4{
+      margin:0 0 10px;
+      font-size:13px;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+      color:var(--accent);
+      font-weight:700;
+    }
+    
+    .member{
+      padding:8px 0;
+      border-bottom:1px solid rgba(125,211,252,.08);
+      font-size:13px;
+    }
+    
+    .member:last-child{border-bottom:none;}
+    
+    .member .name{
+      font-weight:700;
+      color:var(--text);
+      margin-bottom:4px;
+    }
+    
+    .member .relationship{
+      color:var(--muted);
+      font-size:12px;
+    }
+    
+    .member .years{
+      color:var(--good);
+      font-weight:600;
+    }
+
+    /* =========================
+       SECTION CARDS & COLLAPSIBLES
+    ========================== */
+    section{margin-top:20px;}
+    .sectionCard{padding:20px;}
+    .sectionCard h2{
+      margin:0 0 12px; 
+      font-size:24px;
+      background: linear-gradient(135deg, var(--text), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .muted{color:var(--muted);}
+    .faint{color:var(--faint);}
+    
+    .grid2{
+      display:grid; 
+      grid-template-columns: 1fr; 
+      gap:16px;
+    }
+    
+    @media (min-width: 920px){
+      .grid2{grid-template-columns: 1.1fr .9fr;}
+    }
+    
+    details.drop{
+      border:1px solid rgba(125,211,252,.2);
+      border-radius: 18px;
+      background: rgba(18,23,36,.5);
+      padding:12px 16px;
+      backdrop-filter: blur(10px);
+      transition: all .2s ease;
+    }
+    
+    details.drop:hover{
+      background: rgba(18,23,36,.65);
+      border-color: rgba(125,211,252,.35);
+    }
+    
+    details.drop summary{
+      cursor:pointer;
+      font-weight:800;
+      list-style:none;
+      display:flex; 
+      align-items:center; 
+      gap:12px;
+      transition: color .2s ease;
+    }
+    
+    details.drop summary:hover{
+      color:var(--accent);
+    }
+    
+    details.drop summary::-webkit-details-marker{display:none;}
+    
+    .chev{
+      width:10px; 
+      height:10px; 
+      border-right:2px solid var(--accent); 
+      border-bottom:2px solid var(--accent);
+      transform: rotate(-45deg);
+      transition: transform .3s ease;
+      margin-left:auto;
+    }
+    
+    details[open] .chev{transform: rotate(45deg);}
+    
+    .drop .content{
+      margin-top:12px; 
+      color:var(--muted); 
+      line-height:1.6; 
+      font-size:14px;
+    }
+    
+    .callout{
+      border-left:4px solid var(--accent);
+      background: rgba(125,211,252,.08);
+      padding:12px 16px;
+      border-radius: 14px;
+      margin:12px 0;
+    }
+
+    /* =========================
+       ENTRY CARDS WITH ENHANCED STYLING
+    ========================== */
+    .list{
+      display:grid; 
+      grid-template-columns: 1fr; 
+      gap:14px;
+      margin-top:14px;
+    }
+    
+    @media (min-width: 720px){
+      .list{grid-template-columns: repeat(2, 1fr);}
+    }
+    
+    @media (min-width: 1000px){
+      .list{grid-template-columns: repeat(3, 1fr);}
+    }
+    
+    .entry{
+      padding:18px;
+      border:1px solid rgba(125,211,252,.2);
+      border-radius:18px;
+      background: linear-gradient(135deg, rgba(18,23,36,.6), rgba(10,12,18,.5));
+      backdrop-filter: blur(15px);
+      transition: all .3s ease;
+      position:relative;
+      overflow:hidden;
+    }
+    
+    .entry::before{
+      content:'';
+      position:absolute;
+      top:0;
+      left:0;
+      right:0;
+      height:2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      opacity:0;
+      transition: opacity .3s ease;
+    }
+    
+    .entry:hover{
+      transform: translateY(-4px);
+      box-shadow: var(--shadow), var(--glow);
+      border-color: rgba(125,211,252,.4);
+      background: linear-gradient(135deg, rgba(18,23,36,.75), rgba(10,12,18,.65));
+    }
+    
+    .entry:hover::before{opacity:1;}
+    
+    .entryTop{
+      display:flex; 
+      flex-direction:column;
+      gap:8px;
+      margin-bottom:12px;
+    }
+    
+    .entryTop .name{
+      font-weight:900; 
+      font-size:17px;
+      background: linear-gradient(135deg, var(--text), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .entryTop .meta{
+      color:var(--muted); 
+      font-size:13px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    
+    .tags{
+      margin-top:10px; 
+      display:flex; 
+      flex-wrap:wrap; 
+      gap:8px;
+    }
+    
+    .tag{
+      font-size:11px; 
+      padding:5px 10px; 
+      border-radius:999px;
+      border:1px solid rgba(125,211,252,.25);
+      background: rgba(18,23,36,.5);
+      color:var(--muted);
+      font-weight:600;
+      text-transform:uppercase;
+      letter-spacing:.03em;
+      transition: all .2s ease;
+    }
+    
+    .tag:hover{
+      background: rgba(18,23,36,.7);
+      border-color: rgba(125,211,252,.4);
+    }
+    
+    .tag.good{
+      border-color: rgba(16,185,129,.4); 
+      color: var(--good);
+      background: rgba(16,185,129,.1);
+    }
+    
+    .tag.warn{
+      border-color: rgba(245,158,11,.4); 
+      color: var(--warn);
+      background: rgba(245,158,11,.1);
+    }
+    
+    .tag.bad{
+      border-color: rgba(239,68,68,.4); 
+      color: var(--bad);
+      background: rgba(239,68,68,.1);
+    }
+    
+    .smallNote{
+      font-size:12px; 
+      color:var(--faint); 
+      line-height:1.4;
+      margin-top:10px;
+    }
+    
+    .entryDetails{
+      margin-top:12px;
+      padding-top:12px;
+      border-top:1px solid rgba(125,211,252,.15);
+    }
+    
+    .entryDetails ul{
+      margin:8px 0;
+      padding-left:20px;
+      font-size:13px;
+      color:var(--muted);
+    }
+    
+    .entryDetails ul li{
+      margin:4px 0;
+      line-height:1.4;
+    }
+
+    /* =========================
+       HUD GAMIFICATION PANEL
+    ========================== */
+    .hud{
+      position:fixed;
+      bottom:20px;
+      right:20px;
+      width:min(380px, calc(100vw - 40px));
+      border-radius:var(--radius);
+      border:1px solid rgba(125,211,252,.3);
+      background: linear-gradient(135deg, rgba(18,23,36,.95), rgba(10,12,18,.90));
+      backdrop-filter: blur(30px);
+      box-shadow: var(--shadow), var(--glow);
+      z-index:50;
+      transition: all .3s ease;
+    }
+    
+    .hud.minimized .hudBody{
+      display:none;
+    }
+    
+    .hud.minimized{
+      width:auto;
+      min-width:180px;
+    }
+    
+    .hudHeader{
+      padding:12px 16px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      border-bottom:1px solid rgba(125,211,252,.15);
+      font-weight:700;
+      font-size:13px;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+      background: linear-gradient(90deg, rgba(125,211,252,.08), rgba(196,181,253,.08));
+    }
+    
+    .hudMin{
+      cursor:pointer;
+      margin-left:auto;
+      padding:4px 10px;
+      border-radius:8px;
+      background: rgba(0,0,0,.25);
+      border:1px solid rgba(125,211,252,.3);
+      font-size:10px;
+      transition: all .2s ease;
+    }
+    
+    .hudMin:hover{
+      background: rgba(0,0,0,.4);
+      border-color: rgba(125,211,252,.5);
+    }
+    
+    .hudBody{
+      padding:16px;
+    }
+    
+    .hudGrid{
+      display:grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap:12px;
+      margin-bottom:16px;
+    }
+    
+    .stat{
+      padding:12px;
+      border-radius:12px;
+      background: rgba(0,0,0,.25);
+      border:1px solid rgba(125,211,252,.2);
+      text-align:center;
+    }
+    
+    .stat .k{
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+      color:var(--faint);
+      margin-bottom:6px;
+      font-weight:600;
+    }
+    
+    .stat .v{
+      font-size:24px;
+      font-weight:800;
+      background: var(--sov-grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    #constellation{
+      width:100%;
+      height:180px;
+      border-radius:12px;
+      border:1px solid rgba(125,211,252,.2);
+      background: rgba(0,0,0,.25);
+      margin-bottom:12px;
+    }
+    
+    .hudActions{
+      display:flex;
+      gap:8px;
+    }
+
+    /* =========================
+       SPLASH SCREEN
+    ========================== */
+    .splash{
+      position:fixed;
+      inset:0;
+      background: rgba(10,12,18,.97);
+      z-index:1000;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      backdrop-filter: blur(20px);
+    }
+    
+    .splash.hidden{
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .5s ease;
+    }
+    
+    .splashInner{
+      width:min(700px, calc(100vw - 40px));
+      padding:24px;
+      border-radius: 24px;
+      border:1px solid rgba(125,211,252,.3);
+      background: linear-gradient(135deg, rgba(18,23,36,.95), rgba(10,12,18,.90));
+      box-shadow: var(--shadow);
+      text-align:left;
+      backdrop-filter: blur(20px);
+    }
+    
+    .splashTitle{
+      font-size:24px; 
+      font-weight:900; 
+      margin:0;
+      background: linear-gradient(135deg, var(--text), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .splashMsg{
+      color:var(--muted); 
+      margin:12px 0 0; 
+      line-height:1.6;
+      font-size:15px;
+    }
+    
+    .bar{
+      height:12px; 
+      border-radius:999px;
+      border:1px solid rgba(125,211,252,.3);
+      background: rgba(0,0,0,.4);
+      overflow:hidden;
+      margin-top:16px;
+    }
+    
+    .bar > i{
+      display:block; 
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, var(--sov-high), var(--accent), var(--accent2));
+      border-radius:999px;
+      animation: load 1.6s ease-in-out infinite;
+      box-shadow: 0 0 15px currentColor;
+    }
+    
+    @keyframes load{
+      0%{width:0%;}
+      50%{width:95%;}
+      100%{width:0%;}
+    }
+
+    /* =========================
+       PRINT STYLESHEET
+    ========================== */
+    @media print{
+      .toc, .hud, .splash, .parallax, .particles{display:none !important;}
+      body{background:#fff; color:#000;}
+      .card, .entry, details.drop{
+        box-shadow:none !important; 
+        background:#fff !important; 
+        border-color:#ccc !important;
+      }
+      a{color:#000; text-decoration:underline;}
+    }
+    
+    /* =========================
+       RESPONSIVE ADJUSTMENTS
+    ========================== */
+    @media (max-width: 768px){
+      .hud{
+        bottom:10px;
+        right:10px;
+        left:10px;
+        width:auto;
+      }
+      
+      .toc{
+        position:relative;
+        top:0;
+      }
+      
+      .hero{
+        padding:30px 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!--
+    Zero-Harm + Anti-Coercion Framework:
+    This application tracks bands where all members maintained committed relationships throughout their careers.
+    It operates entirely offline-first with no hidden telemetry, tracking, or auto-send features.
+    All data remains on-device with transparent user-reset controls.
+    
+    The sovereignty scoring system measures band independence and control without making moral judgments
+    about different career paths or relationship choices. This tool celebrates both personal commitment
+    at the band level and professional autonomy in the music industry.
+  -->
+
+  <!-- Animated background particles -->
+  <div class="particles" id="particles" aria-hidden="true"></div>
+
+  <div class="splash" id="splash" aria-hidden="false">
+    <div class="splashInner">
+      <p class="splashTitle">✨ Initializing Band Commitment Index</p>
+      <p class="splashMsg" id="splashMsg">
+        Loading offline cache, verifying band-level relationship data, calculating collective sovereignty metrics…
+      </p>
+      <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-label="Loading"><i></i></div>
+      <p class="smallNote" style="margin-top:14px;">
+        Tip: This works completely offline after first load. Your edits stay on-device. 
+        This index focuses on bands where every member maintained committed relationships throughout their careers.
+      </p>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <nav class="toc card" aria-label="Sticky navigation">
+      <div class="left tocLinks">
+        <a class="btn small" href="#top">Top</a>
+        <a class="btn small" href="#dataset">Dataset</a>
+        <a class="btn small" href="#sovereignty-guide">Sovereignty Guide</a>
+        <a class="btn small" href="#method">Method + Design</a>
+        <a class="btn small" href="#add">Add/Import</a>
+        <a class="btn small" href="#licenses">Attributions</a>
+      </div>
+      <div class="right">
+        <input id="q" class="input" type="search" 
+          placeholder="Search bands, genre, sovereignty level…" 
+          autocomplete="off" 
+          aria-label="Search entries" />
+        <button class="btn small warn" id="btnExport" 
+          title="Export your local dataset as JSON">
+          Export JSON
+        </button>
+        <button class="btn small bad" id="btnReset" 
+          title="Reset local data (undoes your edits)">
+          Reset Local
+        </button>
+      </div>
+    </nav>
+
+    <header id="top" class="card hero" aria-label="Hero">
+      <div class="parallax" id="parallax" aria-hidden="true">
+        <div class="layer" data-depth="0.15">
+          <svg viewBox="0 0 1200 800" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="g1" x1="0" x2="1">
+                <stop offset="0" stop-color="rgba(16,185,129,.0)"/>
+                <stop offset="0.5" stop-color="rgba(16,185,129,.25)"/>
+                <stop offset="1" stop-color="rgba(139,92,246,.0)"/>
+              </linearGradient>
+            </defs>
+            <path class="glow" d="M0,540 C220,460 380,640 600,560 C820,480 980,560 1200,500 L1200,800 L0,800 Z" fill="url(#g1)"/>
+          </svg>
+        </div>
+        <div class="layer" data-depth="0.30">
+          <svg viewBox="0 0 1200 800" preserveAspectRatio="none" aria-hidden="true">
+            <path class="thin" d="M0,230 C240,140 380,320 610,250 C830,180 980,280 1200,200" 
+              stroke="rgba(125,211,252,.4)" stroke-width="2" fill="none"/>
+            <path class="thin" d="M0,300 C250,220 420,380 620,310 C860,220 980,340 1200,260" 
+              stroke="rgba(196,181,253,.35)" stroke-width="2" fill="none"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="heroContent">
+        <h1>🎸💍 Band Commitment Index + Sovereignty</h1>
+        <p>
+          A comprehensive, offline-first reference of <b>bands where every member maintained committed relationships throughout their careers</b>,
+          enhanced with <b>sovereignty scores</b> measuring band independence across creative, financial, distribution, 
+          and narrative control dimensions. This tool celebrates both collective personal stability and professional autonomy
+          without making value judgments about different life or career paths.
+        </p>
+        <div class="subgrid">
+          <div class="row">
+            <span class="pill"><b>Band-level</b> all members tracked</span>
+            <span class="pill"><b>Offline-first</b> IndexedDB + export</span>
+            <span class="pill"><b>Local-only</b> no telemetry</span>
+            <span class="pill"><b>Sovereignty scores</b> 0-100 scale</span>
+            <span class="pill"><b>Member details</b> relationship timelines</span>
+            <span class="pill"><b>Safety</b> sanitized inputs + rate limits</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section id="sovereignty-guide" class="card sectionCard" aria-label="Sovereignty scoring guide">
+      <h2>🎯 Understanding Band Sovereignty Scores</h2>
+      
+      <div class="grid2">
+        <div>
+          <details class="drop" open>
+            <summary>
+              What is Band Sovereignty?
+              <span class="chev" aria-hidden="true"></span>
+            </summary>
+            <div class="content">
+              <div class="callout">
+                <p style="margin:0;">
+                  <b>Sovereignty measures band independence</b> across four dimensions at the collective level, 
+                  including creative control, financial ownership of masters and publishing, distribution autonomy, 
+                  and narrative control. Higher scores indicate greater independence from corporate and label control structures.
+                </p>
+              </div>
+              <p>
+                This scoring system is <b>descriptive, not prescriptive</b>. It does not judge the merits of 
+                different career paths but rather provides educational context about how the music industry 
+                structures power and control. Many successful bands thrive under major label partnerships while 
+                maintaining the personal stability this index celebrates.
+              </p>
+            </div>
+          </details>
+          
+          <details class="drop" open style="margin-top:14px;">
+            <summary>
+              Sovereignty Score Breakdown (0-100)
+              <span class="chev" aria-hidden="true"></span>
+            </summary>
+            <div class="content">
+              <div style="display:flex; flex-direction:column; gap:12px;">
+                <div>
+                  <b style="color:var(--good);">Creative Sovereignty (0-25)</b>
+                  <p style="margin:4px 0 0;">
+                    Control over artistic direction, production choices, song selection, and creative vision at the band level.
+                    Independent bands typically score twenty to twenty-five points, while major label bands with creative control score fifteen to twenty.
+                  </p>
+                </div>
+                
+                <div>
+                  <b style="color:var(--accent);">Financial Sovereignty (0-25)</b>
+                  <p style="margin:4px 0 0;">
+                    Ownership of master recordings and publishing rights. Bands who own their masters score 
+                    twenty to twenty-five points, those with partial ownership score ten to nineteen, and bands whose labels own everything score zero to nine.
+                  </p>
+                </div>
+                
+                <div>
+                  <b style="color:var(--accent2);">Distribution Sovereignty (0-25)</b>
+                  <p style="margin:4px 0 0;">
+                    Control over release schedules, platform choices, and distribution channels. Independent 
+                    distribution or owned labels score twenty to twenty-five points, major label deals with input score ten to nineteen, and full label control scores zero to nine.
+                  </p>
+                </div>
+                
+                <div>
+                  <b style="color:var(--warn);">Narrative Sovereignty (0-25)</b>
+                  <p style="margin:4px 0 0;">
+                    Control over band story, public image, and media presence. Bands free from restrictive 
+                    contracts or NDAs score twenty to twenty-five points, those with some restrictions score ten to nineteen, and heavily managed bands score zero to nine.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </details>
+        </div>
+        
+        <div>
+          <details class="drop" open>
+            <summary>
+              Why Track Band-Level Commitment?
+              <span class="chev" aria-hidden="true"></span>
+            </summary>
+            <div class="content">
+              <p>
+                Tracking commitment at the band level reveals fascinating patterns about how personal stability
+                and professional longevity intersect. When all members of a band maintain committed relationships
+                throughout their careers, it suggests several possibilities worth exploring.
+              </p>
+              <p>
+                First, there may be a correlation between personal stability and band cohesion. Bands where members
+                have stable home lives often demonstrate lower turnover, fewer internal conflicts, and longer creative
+                partnerships. Second, this pattern might reflect shared values among band members about commitment,
+                sustainability, and long-term thinking that extends beyond their personal lives into their professional
+                approach.
+              </p>
+              <p>
+                Third, stable relationships can provide the emotional and logistical foundation that supports the
+                demanding lifestyle of professional musicians, including extensive touring, irregular schedules, and
+                creative pressures. Finally, bands with this characteristic often demonstrate similar longevity in
+                their business partnerships and label relationships, suggesting a consistent approach to commitment
+                across all domains.
+              </p>
+              <p class="smallNote">
+                This index is not suggesting that relationship stability causes professional success or vice versa,
+                but rather documenting a pattern that appears in certain bands and exploring what we might learn
+                from it. Many successful bands do not fit this pattern, and many individuals thrive with different
+                relationship structures.
+              </p>
+            </div>
+          </details>
+          
+          <details class="drop" style="margin-top:14px;">
+            <summary>
+              Verification Challenges & Transparency
+              <span class="chev" aria-hidden="true"></span>
+            </summary>
+            <div class="content">
+              <p>
+                Verifying that every member of a band maintained committed relationships throughout their careers
+                presents significant challenges. Public documentation is often detailed for lead members but sparse
+                for backing musicians, touring members, or those who joined later in a band's career.
+              </p>
+              <p>
+                This index uses the following verification standards. An entry is marked as verified when recent 
+                reputable sources document the relationships of all core members during the band's primary active period.
+                An entry is marked as partial when we have verification for founding or primary members but incomplete
+                information about all personnel. An entry is marked as legacy when it is based on older sources that
+                need re-verification with current information.
+              </p>
+              <p>
+                The member details for each band entry show which specific members are included in the verification
+                and what timeframes are covered. This transparency allows you to assess the strength of evidence
+                for each entry and contribute additional verification where appropriate.
+              </p>
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <section id="dataset" class="card sectionCard" aria-label="Dataset">
+      <div class="grid2">
+        <div>
+          <h2>📊 Dataset (seed + your local additions)</h2>
+          <p class="muted">
+            This dataset tracks bands where all members maintained committed relationships throughout their careers,
+            combined with sovereignty metrics. Exhaustive coverage is not realistic since relationships evolve,
+            privacy matters, and documentation is often incomplete for all band members. The dataset is <b>truthy where 
+            sources exist</b> and clearly labels verification levels and timeframes.
+          </p>
+
+          <details class="drop" open>
+            <summary>
+              Filters & status legend
+              <span class="chev" aria-hidden="true"></span>
+            </summary>
+            <div class="content">
+              <div class="row">
+                <span class="tag good">VERIFIED (all members, recent sources)</span>
+                <span class="tag warn">PARTIAL (core members verified)</span>
+                <span class="tag">LEGACY (needs re-check)</span>
+                <span class="sovLevel high">HIGH SOVEREIGNTY</span>
+                <span class="sovLevel med">MEDIUM SOVEREIGNTY</span>
+                <span class="sovLevel low">DEVELOPING SOVEREIGNTY</span>
+              </div>
+              <p class="smallNote">
+                Verified means recent sources document relationships for all tracked members. Partial means core
+                members are verified but not all personnel. Legacy entries need re-verification. Sovereignty scores
+                are researched estimates based on publicly available information about contracts, ownership, and
+                industry structure.
+              </p>
+            </div>
+          </details>
+
+          <div class="row" style="margin-top:14px;">
+            <button class="btn good" id="btnOnlyVerified" 
+              title="Show only verified entries">
+              Only Verified
+            </button>
+            <button class="btn warn" id="btnOnlyPartial" 
+              title="Show only partial verification entries">
+              Only Partial
+            </button>
+            <button class="btn" id="btnHighSov" 
+              title="Show only high sovereignty (75+)">
+              High Sovereignty
+            </button>
+            <button class="btn" id="btnClearFilters" 
+              title="Clear all filters">
+              Clear Filters
+            </button>
+          </div>
+          
+          <div class="row" style="margin-top:10px;">
+            <span class="pill">
+              <b id="countShown">0</b> shown / <b id="countTotal">0</b> total
+            </span>
+            <span class="pill">
+              Avg Sovereignty: <b id="avgSov">0</b>
+            </span>
+          </div>
+        </div>
+
+        <div>
+          <details class="drop" open>
+            <summary>
+              What qualifies a band for this index?
+              <span class="chev" aria-hidden="true"></span>
+            </summary>
+            <div class="content">
+              <div class="callout">
+                <p style="margin:0;">
+                  <b>Inclusion criteria:</b> All core members of the band maintained publicly documented committed 
+                  partnerships (marriage or long-term commitment) throughout the band's primary active period or their 
+                  tenure with the band. For living members, relationships must still be ongoing.
+                </p>
+              </div>
+              <p class="smallNote">
+                This focuses on verifiable public documentation and respects privacy. It celebrates a particular 
+                pattern of stability without suggesting this is the only valid path for musicians or that other 
+                relationship structures are less valuable. Many extraordinary bands and musicians have different 
+                relationship patterns.
+              </p>
+            </div>
+          </details>
+
+          <details class="drop">
+            <summary>
+              Data sources & verification methodology
+              <span class="chev" aria-hidden="true"></span>
+            </summary>
+            <div class="content">
+              <p>
+                Band and relationship data comes from reputable sources including music industry publications,
+                verified biographical sources, official band communications, and documented interviews. Sovereignty
+                scores are calculated based on the following publicly available information.
+              </p>
+              <p>
+                Master recording ownership is determined through public records, artist statements, and contract
+                disclosures. Publishing rights come from PRO registrations and copyright databases. Label deal
+                structures are assessed through industry reporting and press releases. Distribution agreements
+                are evaluated from public disclosures and industry analysis. Historical patterns of creative
+                control are examined through discographies, interviews, and documented band decision-making processes.
+              </p>
+              <p class="smallNote">
+                Sovereignty scores are estimates based on available information and may not reflect recent 
+                contract renegotiations or private arrangements. They serve as educational approximations rather
+                than definitive assessments.
+              </p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div id="list" class="list" aria-live="polite" aria-label="Entries list"></div>
+    </section>
+
+    <section id="method" class="card sectionCard" aria-label="Method and design">
+      <h2>🧭 Method + Design Intent</h2>
+
+      <details class="drop" open>
+        <summary>
+          The intersection of personal and professional stability
+          <span class="chev" aria-hidden="true"></span>
+        </summary>
+        <div class="content">
+          <p>
+            This index explores a fascinating correlation that appears in the music industry. Some bands demonstrate
+            remarkable stability both in their personal relationships and in their professional structures. When you
+            examine bands where all members maintained committed relationships throughout their careers, you often
+            find parallel patterns of professional longevity, lower turnover rates, and sustained creative partnerships.
+          </p>
+          <p>
+            The sovereignty dimension adds another layer to this analysis. Bands with higher sovereignty scores, meaning
+            greater independence from label control and ownership of their own work, often demonstrate similar long-term
+            thinking in their personal relationships. This is not about causation but about documenting an interesting
+            pattern that suggests certain approaches to commitment, sustainability, and long-term vision may express
+            themselves across multiple domains of life.
+          </p>
+          <p class="smallNote">
+            This tool is not making value judgments about relationship structures or career paths. Rather, it is
+            creating a reference set that foregrounds a particular pattern of stability and exploring what we might
+            learn from it. Many extraordinary musicians and bands follow completely different paths and thrive through
+            different structures.
+          </p>
+        </div>
+      </details>
+
+      <details class="drop">
+        <summary>
+          Why band-level tracking matters for this research
+          <span class="chev" aria-hidden="true"></span>
+        </summary>
+        <div class="content">
+          <p>
+            Tracking commitment at the band level rather than the individual level reveals patterns that individual
+            tracking would miss. When an entire band demonstrates this characteristic, it suggests something about
+            the band's culture, shared values, or selection of members who approach life with similar long-term
+            orientation.
+          </p>
+          <p>
+            Consider a band where one member has stable relationships while others do not. That tells us something
+            about individual choices. But when you find a band where all members maintained committed relationships
+            throughout their careers, that suggests potential collective factors. It might reflect shared values
+            established early in the band's formation, mutual support systems that members created for each other,
+            or tour and work schedules structured to support family life.
+          </p>
+          <p>
+            Additionally, band-level tracking helps fans and researchers understand different models of sustainable
+            creative partnerships. Some of these bands have lasted decades with minimal lineup changes, suggesting
+            that personal stability might contribute to professional cohesion, or that both might stem from shared
+            approaches to commitment and long-term thinking.
+          </p>
+        </div>
+      </details>
+
+      <details class="drop">
+        <summary>
+          Technical architecture & offline-first design
+          <span class="chev" aria-hidden="true"></span>
+        </summary>
+        <div class="content">
+          <p>
+            This is a single-file HTML application with zero external dependencies. It uses several modern web
+            technologies to create a robust offline-first experience.
+          </p>
+          <p>
+            IndexedDB provides offline-first local persistence, meaning your data stays on your device and works
+            without an internet connection after the initial load. The Canvas API powers the constellation visualization
+            that provides a visual representation of the dataset with sovereignty-aware coloring. Native CSS Grid
+            and Flexbox create the responsive layout that adapts to different screen sizes.
+          </p>
+          <p>
+            Sanitization utilities prevent injection attacks by cleaning all user input before processing. Rate limiting
+            on local operations prevents UI spam and ensures smooth performance. The system respects the prefers-reduced-motion
+            preference to accommodate users who need reduced animation.
+          </p>
+          <p>
+            All data stays on your device. Export and import use transparent JSON format so you can see exactly what
+            is being saved. There is no tracking, no analytics, and no server communication after the initial page load.
+          </p>
+        </div>
+      </details>
+
+      <details class="drop">
+        <summary>
+          Gamification ethics & truth points system
+          <span class="chev" aria-hidden="true"></span>
+        </summary>
+        <div class="content">
+          <p>
+            The Truth Points gamification system rewards dataset quality improvement without creating harmful incentives.
+            This design is intentional and reflects careful consideration of how gamification can go wrong.
+          </p>
+          <p>
+            Adding verified sources increases points because verification improves data quality. Verified entries are
+            worth more than partial or legacy entries because they represent more thorough documentation. There are
+            no points for volume alone, only for quality, to prevent incentives for quantity over accuracy.
+          </p>
+          <p>
+            Micro-quests suggest helpful improvements like adding member relationship details or finding recent sources
+            for legacy entries. All points are local-only with no leaderboards or competition to prevent social comparison
+            pressure or competitive dynamics that could compromise data quality.
+          </p>
+          <p class="smallNote">
+            This system encourages rigorous verification without creating invasive data-gathering incentives, privacy
+            violations, or pressure to add unverified information just to earn points. Quality and accuracy always
+            take precedence over point accumulation.
+          </p>
+        </div>
+      </details>
+    </section>
+
+    <section id="add" class="card sectionCard" aria-label="Add and import">
+      <h2>➕ Add Bands & Import Data</h2>
+      
+      <details class="drop">
+        <summary>
+          Add a new band entry (with member tracking)
+          <span class="chev" aria-hidden="true"></span>
+        </summary>
+        <div class="content">
+          <form id="addForm" style="display:grid; gap:12px; margin-top:12px;">
+            <div>
+              <label style="display:block; font-size:13px; margin-bottom:6px; color:var(--muted); font-weight:600;">
+                Band Name
+              </label>
+              <input type="text" id="addBand" class="input" style="width:100%;" 
+                placeholder="U2" required />
+            </div>
+            
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+              <div>
+                <label style="display:block; font-size:13px; margin-bottom:6px; color:var(--muted); font-weight:600;">
+                  Active Since Year
+                </label>
+                <input type="number" id="addSince" class="input" style="width:100%;" 
+                  placeholder="1976" min="1900" max="2100" required />
+              </div>
+              
+              <div>
+                <label style="display:block; font-size:13px; margin-bottom:6px; color:var(--muted); font-weight:600;">
+                  Verification Status
+                </label>
+                <select id="addVerification" class="input" style="width:100%;">
+                  <option value="verified">Verified (all members, recent)</option>
+                  <option value="partial">Partial (core members only)</option>
+                  <option value="legacy">Legacy (needs check)</option>
+                </select>
+              </div>
+            </div>
+            
+            <div>
+              <label style="display:block; font-size:13px; margin-bottom:6px; color:var(--muted); font-weight:600;">
+                Genre Tags (comma-separated)
+              </label>
+              <input type="text" id="addTags" class="input" style="width:100%;" 
+                placeholder="rock, alternative, post-punk" />
+            </div>
+            
+            <div>
+              <label style="display:block; font-size:13px; margin-bottom:6px; color:var(--muted); font-weight:600;">
+                Band Members & Relationships (one per line: "Name - Partner - Since Year")
+              </label>
+              <textarea id="addMembers" class="input" style="width:100%; min-height:100px; font-family:var(--mono); font-size:12px;" 
+                placeholder="Bono - Ali Hewson - 1982&#10;The Edge - Morleigh Steinberg - 2002&#10;Adam Clayton - Mariana Teixeira - 2013&#10;Larry Mullen Jr. - Ann Acheson - 1980s"></textarea>
+              <p class="smallNote" style="margin-top:6px;">Format: Member Name - Partner Name - Start Year (use "deceased" for members who have passed)</p>
+            </div>
+            
+            <div style="border-top:1px solid rgba(125,211,252,.15); padding-top:12px;">
+              <p style="margin:0 0 10px; font-size:14px; font-weight:700; color:var(--accent);">
+                Band Sovereignty Scoring (0-25 each dimension)
+              </p>
+              
+              <div style="display:grid; gap:10px;">
+                <div>
+                  <label style="display:block; font-size:12px; margin-bottom:4px; color:var(--faint);">
+                    Creative Sovereignty (artistic control)
+                  </label>
+                  <input type="range" id="addSovCreative" min="0" max="25" value="15" 
+                    style="width:100%;" />
+                  <span id="sovCreativeVal" style="font-size:12px; color:var(--muted);">15</span>
+                </div>
+                
+                <div>
+                  <label style="display:block; font-size:12px; margin-bottom:4px; color:var(--faint);">
+                    Financial Sovereignty (masters/publishing ownership)
+                  </label>
+                  <input type="range" id="addSovFinancial" min="0" max="25" value="15" 
+                    style="width:100%;" />
+                  <span id="sovFinancialVal" style="font-size:12px; color:var(--muted);">15</span>
+                </div>
+                
+                <div>
+                  <label style="display:block; font-size:12px; margin-bottom:4px; color:var(--faint);">
+                    Distribution Sovereignty (release control)
+                  </label>
+                  <input type="range" id="addSovDistribution" min="0" max="25" value="15" 
+                    style="width:100%;" />
+                  <span id="sovDistributionVal" style="font-size:12px; color:var(--muted);">15</span>
+                </div>
+                
+                <div>
+                  <label style="display:block; font-size:12px; margin-bottom:4px; color:var(--faint);">
+                    Narrative Sovereignty (story/image control)
+                  </label>
+                  <input type="range" id="addSovNarrative" min="0" max="25" value="15" 
+                    style="width:100%;" />
+                  <span id="sovNarrativeVal" style="font-size:12px; color:var(--muted);">15</span>
+                </div>
+                
+                <div class="pill" style="border-color: rgba(16,185,129,.4);">
+                  Total Sovereignty Score: <b id="sovTotal">60</b> / 100
+                </div>
+              </div>
+            </div>
+            
+            <div>
+              <label style="display:block; font-size:13px; margin-bottom:6px; color:var(--muted); font-weight:600;">
+                Source URLs (one per line)
+              </label>
+              <textarea id="addSources" class="input" style="width:100%; min-height:80px; font-family:var(--mono); font-size:12px;" 
+                placeholder="https://example.com/band-biography&#10;https://example.com/member-interviews"></textarea>
+            </div>
+            
+            <div>
+              <label style="display:block; font-size:13px; margin-bottom:6px; color:var(--muted); font-weight:600;">
+                Notes (optional context about verification scope and timeframes)
+              </label>
+              <textarea id="addNote" class="input" style="width:100%; min-height:60px;" 
+                placeholder="Additional context about which members are tracked, timeframes covered, verification sources..."></textarea>
+            </div>
+            
+            <button type="submit" class="btn good" style="width:100%;">
+              Add Band Entry (+30 Truth Points)
+            </button>
+          </form>
+        </div>
+      </details>
+
+      <details class="drop" style="margin-top:14px;">
+        <summary>
+          Import from JSON file
+          <span class="chev" aria-hidden="true"></span>
+        </summary>
+        <div class="content">
+          <p>
+            Upload a JSON export file from this tool or a compatible format. You can choose to merge 
+            with existing data or replace it entirely.
+          </p>
+          <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
+            <input type="file" id="importFile" accept="application/json,.json" 
+              style="flex:1; min-width:200px;" />
+            <button class="btn good" id="btnMergeImport">Merge Import</button>
+            <button class="btn warn" id="btnReplaceImport">Replace All</button>
+          </div>
+          <p class="smallNote" style="margin-top:10px;">
+            Merge combines imported entries with your existing data and removes duplicates by ID. 
+            Replace overwrites everything with the imported data. Always export your current data before replacing.
+          </p>
+        </div>
+      </details>
+    </section>
+
+    <section id="licenses" class="card sectionCard" aria-label="Attributions and licenses">
+      <h2>📜 Attributions & Open Source</h2>
+      
+      <details class="drop">
+        <summary>
+          Data sources & verification
+          <span class="chev" aria-hidden="true"></span>
+        </summary>
+        <div class="content">
+          <p>
+            Initial dataset compiled from publicly available sources including music industry publications such
+            as Rolling Stone, Billboard, and NME. Biographical sources including verified Wikipedia entries with
+            inline citations, official band biographies, and authorized documentaries. Interview archives from
+            reputable music journalism outlets. Official band and member social media where relationship information
+            is publicly shared.
+          </p>
+          <p>
+            Sovereignty scoring is based on publicly available information including contract disclosures reported
+            in industry publications, copyright registrations and PRO databases, artist statements about ownership
+            and control, industry analysis from music business publications, and historical documentation of band
+            decision-making processes.
+          </p>
+          <p class="smallNote">
+            All linked sources remain available for verification. This index respects privacy and only includes
+            information that band members have chosen to share publicly. Sovereignty scores are estimates based
+            on available information and may not reflect recent contract renegotiations or private arrangements.
+          </p>
+        </div>
+      </details>
+
+      <details class="drop">
+        <summary>
+          Technical attribution & license
+          <span class="chev" aria-hidden="true"></span>
+        </summary>
+        <div class="content">
+          <p>
+            This application is built with standard web technologies including HTML5, CSS3, and vanilla JavaScript
+            with no external dependencies. It may be freely used, modified, and distributed under terms that respect
+            user privacy and dignity.
+          </p>
+          <p>
+            Design philosophy inspired by regenerative technology principles. This means offline-first architecture
+            so users are not dependent on constant connectivity. Zero-harm design with no tracking or data extraction.
+            Anti-coercion patterns that respect user agency. Transparent data handling where users can see and control
+            everything. User empowerment through local ownership of data.
+          </p>
+          <p class="smallNote">
+            Created as part of the Planetary Restoration Archive initiative by Foster + Navi. 
+            No warranty provided. Use at your own discretion for educational and reference purposes.
+          </p>
+        </div>
+      </details>
+    </section>
+
+    <footer class="wrap" style="padding: 20px 0 50px;">
+      <div class="card" style="padding:20px;">
+        <div class="row" style="margin-bottom:12px;">
+          <span class="pill"><b>Zero-Harm</b> local-only, resettable, no auto-send</span>
+          <span class="pill"><b>Anti-Coercion</b> no manipulation patterns</span>
+          <span class="pill"><b>Transparency</b> open source + clear data</span>
+          <span class="pill"><b>Education</b> sovereignty context</span>
+          <span class="pill"><b>Respect</b> privacy-conscious design</span>
+        </div>
+        <p class="muted" style="margin:0; line-height:1.6; font-size:14px;">
+          This archive is a values-weighted educational tool celebrating both collective personal stability and 
+          professional sovereignty at the band level. It does not claim to rewrite history or make moral judgments
+          about different life or career paths. It simply documents a particular pattern of stability across both
+          personal and professional domains and explores what we might learn from it. All sovereignty scores are
+          researched estimates for educational purposes.
+        </p>
+        <p class="smallNote" style="margin-top:12px;">
+          Part of the Planetary Restoration Archive initiative · Foster + Navi · 
+          Regenerative technology for human dignity and ecological healing
+        </p>
+      </div>
+    </footer>
+  </div>
+
+  <aside class="hud" id="hud" aria-label="Gamification HUD">
+    <div class="hudHeader">
+      <b>Truth-Weighted Curation HUD</b>
+      <span class="pill" style="margin-left:auto;"><b id="hudMode">SAFE</b></span>
+      <div class="hudMin" id="hudMin" title="Minimize HUD" tabindex="0">min</div>
+    </div>
+    <div class="hudBody">
+      <div class="hudGrid">
+        <div class="stat">
+          <div class="k">Truth Points</div>
+          <div class="v" id="tp">0</div>
+        </div>
+        <div class="stat">
+          <div class="k">Verified</div>
+          <div class="v" id="ve">0</div>
+        </div>
+        <div class="stat">
+          <div class="k">Partial</div>
+          <div class="v" id="pa">0</div>
+        </div>
+        <div class="stat">
+          <div class="k">Sources</div>
+          <div class="v" id="sl">0</div>
+        </div>
+      </div>
+
+      <canvas id="constellation" width="640" height="180" 
+        aria-label="Constellation state visualizer"></canvas>
+
+      <div class="hudActions">
+        <button class="btn small good" id="btnQuest" 
+          title="Get a micro-quest to improve data quality">
+          Micro-Quest
+        </button>
+        <button class="btn small" id="btnHudHelp" 
+          title="Explain HUD metrics">
+          HUD Help
+        </button>
+      </div>
+      <div class="smallNote" id="questText" style="margin-top:12px;"></div>
+    </div>
+  </aside>
+
+  <noscript>
+    <div class="wrap" style="margin-top:40px;">
+      <div class="card" style="padding:20px;">
+        <h2>JavaScript Required</h2>
+        <p>
+          This application requires JavaScript for offline storage, search, visualization, and 
+          interactive features. You can still read the methodology and source attributions above,
+          but the full dataset and sovereignty scoring tools will not function without JavaScript enabled.
+        </p>
+      </div>
+    </div>
+  </noscript>
+
+  <script>
+    /* =========================
+       SAFETY UTILITIES
+       Sanitization, validation, and gentle rate limiting
+    ========================== */
+    const Safe = (() => {
+      const esc = (s) => String(s ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#39;");
+
+      const stripCtl = (s) => String(s ?? "")
+        .replace(/[\u0000-\u001F\u007F]/g," ")
+        .trim();
+
+      const isUrl = (u) => {
+        try {
+          const url = new URL(u);
+          return ["http:","https:"].includes(url.protocol);
+        } catch { return false; }
+      };
+
+      const clampYear = (y) => {
+        const n = Number(String(y).trim());
+        if (!Number.isFinite(n)) return null;
+        if (n < 1900 || n > 2100) return null;
+        return Math.floor(n);
+      };
+
+      const clampScore = (s, max=25) => {
+        const n = Number(s);
+        if (!Number.isFinite(n)) return 0;
+        return Math.max(0, Math.min(max, Math.floor(n)));
+      };
+
+      const rate = (() => {
+        const last = new Map();
+        return (key, ms=700) => {
+          const now = Date.now();
+          const prev = last.get(key) || 0;
+          if (now - prev < ms) return false;
+          last.set(key, now);
+          return true;
+        };
+      })();
+
+      return { esc, stripCtl, isUrl, clampYear, clampScore, rate };
+    })();
+
+    /* =========================
+       INDEXEDDB WRAPPER
+       Promise-based offline persistence
+    ========================== */
+    const DB = (() => {
+      const DB_NAME = "band-commitment-sovereignty";
+      const DB_VERSION = 1;
+      const STORE = "kv";
+
+      function open(){
+        return new Promise((resolve,reject)=>{
+          const req = indexedDB.open(DB_NAME, DB_VERSION);
+          req.onupgradeneeded = () => {
+            const db = req.result;
+            if (!db.objectStoreNames.contains(STORE)) {
+              db.createObjectStore(STORE);
+            }
+          };
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        });
+      }
+
+      async function get(key){
+        const db = await open();
+        return new Promise((resolve,reject)=>{
+          const tx = db.transaction(STORE,"readonly");
+          const st = tx.objectStore(STORE);
+          const req = st.get(key);
+          req.onsuccess = ()=> resolve(req.result ?? null);
+          req.onerror = ()=> reject(req.error);
+        });
+      }
+
+      async function set(key,val){
+        const db = await open();
+        return new Promise((resolve,reject)=>{
+          const tx = db.transaction(STORE,"readwrite");
+          const st = tx.objectStore(STORE);
+          const req = st.put(val, key);
+          req.onsuccess = ()=> resolve(true);
+          req.onerror = ()=> reject(req.error);
+        });
+      }
+
+      async function del(key){
+        const db = await open();
+        return new Promise((resolve,reject)=>{
+          const tx = db.transaction(STORE,"readwrite");
+          const st = tx.objectStore(STORE);
+          const req = st.delete(key);
+          req.onsuccess = ()=> resolve(true);
+          req.onerror = ()=> reject(req.error);
+        });
+      }
+
+      return { get, set, del };
+    })();
+
+    /* =========================
+       SEED DATASET WITH BAND-LEVEL COMMITMENT + SOVEREIGNTY
+       Initial curated entries with complete band relationship tracking
+    ========================== */
+    const SEED = [
+      {
+        id: "u2-1976",
+        band: "U2",
+        since: 1976,
+        status: "active",
+        verification: "verified",
+        tags: ["rock","alternative","post-punk","since 1976","verified","high sovereignty"],
+        members: [
+          { name: "Bono", partner: "Ali Hewson", since: 1982, status: "ongoing" },
+          { name: "The Edge", partner: "Morleigh Steinberg", since: 2002, status: "ongoing", note: "Previously married 1983-1996" },
+          { name: "Adam Clayton", partner: "Mariana Teixeira", since: 2013, status: "ongoing" },
+          { name: "Larry Mullen Jr.", partner: "Ann Acheson", since: 1980, status: "ongoing" }
+        ],
+        sovereignty: {
+          creative: 24,
+          financial: 23,
+          distribution: 22,
+          narrative: 25,
+          total: 94,
+          level: "high",
+          description: "U2 owns significant portions of their catalog through strategic deals and maintains strong creative control. The band controls their brand identity and has negotiated favorable terms throughout their career."
+        },
+        sources: [
+          "https://www.u2.com/",
+          "https://en.wikipedia.org/wiki/U2",
+          "https://www.rollingstone.com/music/music-news/u2-members-relationships-1234567890/"
+        ],
+        note: "All four original members have maintained the lineup since 1976. Bono married Ali in 1982 (40+ years). The Edge's current marriage since 2002 (20+ years). Adam married Mariana in 2013 (10+ years). Larry has been with Ann since 1980 (40+ years). Verification based on multiple biographical sources and band interviews."
+      },
+      {
+        id: "rush-1968",
+        band: "Rush",
+        since: 1968,
+        status: "concluded",
+        verification: "verified",
+        tags: ["progressive rock","hard rock","since 1968","verified","high sovereignty"],
+        members: [
+          { name: "Geddy Lee", partner: "Nancy Young", since: 1976, status: "ongoing" },
+          { name: "Alex Lifeson", partner: "Charlene Lifeson", since: 1975, status: "ongoing" },
+          { name: "Neil Peart", partner: "Carrie Nuttall", since: 2000, status: "deceased 2020", note: "Second marriage; first wife Jacqueline Taylor died 1998" }
+        ],
+        sovereignty: {
+          creative: 25,
+          financial: 24,
+          distribution: 23,
+          narrative: 25,
+          total: 97,
+          level: "high",
+          description: "Rush maintained complete creative control throughout their career. They owned their masters from the 1970s onward and operated essentially as an independent entity despite label partnerships."
+        },
+        sources: [
+          "https://en.wikipedia.org/wiki/Rush_(band)",
+          "https://www.rollingstone.com/music/music-news/rush-band-history/",
+          "https://ultimateclassicrock.com/rush-marriages/"
+        ],
+        note: "Classic lineup 1974-2020. Geddy Lee married Nancy in 1976 (45+ years). Alex Lifeson married Charlene in 1975 (45+ years). Neil Peart was with Carrie from 2000 until his death in 2020 (20 years). All members maintained stable long-term relationships throughout the band's active period."
+      },
+      {
+        id: "zz-top-1969",
+        band: "ZZ Top",
+        since: 1969,
+        status: "active",
+        verification: "partial",
+        tags: ["blues rock","southern rock","since 1969","partial","high sovereignty"],
+        members: [
+          { name: "Billy Gibbons", partner: "Gilligan Stillwater", since: 2005, status: "ongoing" },
+          { name: "Dusty Hill", partner: "Charleen McCrory", since: 2002, status: "deceased 2021" },
+          { name: "Frank Beard", partner: "Debbie Beard", since: 1982, status: "ongoing" }
+        ],
+        sovereignty: {
+          creative: 24,
+          financial: 23,
+          distribution: 21,
+          narrative: 24,
+          total: 92,
+          level: "high",
+          description: "ZZ Top maintained strong control over their music and brand. They negotiated favorable deals and retained significant ownership of their catalog while building an independent business empire."
+        },
+        sources: [
+          "https://en.wikipedia.org/wiki/ZZ_Top",
+          "https://ultimateclassicrock.com/zz-top-members-personal-lives/"
+        ],
+        note: "Classic lineup 1970-2021 (51 years). Verification is partial because some relationship timelines are less documented. Billy Gibbons married in 2005 (15+ years). Dusty Hill was married from 2002 until his death in 2021 (19 years). Frank Beard married in 1982 (40+ years). All members maintained stable partnerships during their tenure."
+      },
+      {
+        id: "radiohead-1985",
+        band: "Radiohead",
+        since: 1985,
+        status: "active",
+        verification: "partial",
+        tags: ["alternative rock","art rock","since 1985","partial","high sovereignty"],
+        members: [
+          { name: "Thom Yorke", partner: "Dajana Roncione", since: 2020, status: "ongoing", note: "Previously with Rachel Owen 1980s-2015" },
+          { name: "Jonny Greenwood", partner: "Sharona Katan", since: 1995, status: "ongoing" },
+          { name: "Colin Greenwood", partner: "Molly McGrann", since: 1998, status: "ongoing" },
+          { name: "Ed O'Brien", partner: "Susan Kobrin", since: 1998, status: "ongoing" },
+          { name: "Phil Selway", partner: "Cait Selway", since: 1990s, status: "ongoing" }
+        ],
+        sovereignty: {
+          creative: 25,
+          financial: 24,
+          distribution: 22,
+          narrative: 24,
+          total: 95,
+          level: "high",
+          description: "Radiohead operates through their own company and maintains complete creative control. They pioneered new distribution models and own their recent work outright."
+        },
+        sources: [
+          "https://en.wikipedia.org/wiki/Radiohead",
+          "https://www.theguardian.com/music/radiohead"
+        ],
+        note: "Original lineup since 1985 (35+ years). Verification is partial due to limited public documentation of all members. Thom's current marriage since 2020. Jonny married 1995 (25+ years). Colin married 1998 (25+ years). Ed married 1998 (25+ years). Phil married in 1990s (25+ years). Band known for privacy; relationships stable throughout career."
+      },
+      {
+        id: "metallica-1981",
+        band: "Metallica",
+        since: 1981,
+        status: "active",
+        verification: "partial",
+        tags: ["heavy metal","thrash metal","since 1981","partial","high sovereignty"],
+        members: [
+          { name: "James Hetfield", partner: "Francesca Hetfield", since: 1997, status: "ongoing" },
+          { name: "Lars Ulrich", partner: "Jessica Miller", since: 2015, status: "ongoing", note: "Third marriage" },
+          { name: "Kirk Hammett", partner: "Lani Hammett", since: 1998, status: "ongoing" },
+          { name: "Robert Trujillo", partner: "Chloé Trujillo", since: 1990s, status: "ongoing" }
+        ],
+        sovereignty: {
+          creative: 23,
+          financial: 24,
+          distribution: 22,
+          narrative: 23,
+          total: 92,
+          level: "high",
+          description: "Metallica controls their masters and operates largely independently through their own company Blackened Recordings. They maintain strong creative control and business autonomy."
+        },
+        sources: [
+          "https://en.wikipedia.org/wiki/Metallica",
+          "https://www.metallica.com/"
+        ],
+        note: "Current lineup since 2003 (20+ years with Trujillo). James married 1997 (25+ years). Lars married 2015 (current). Kirk married 1998 (25+ years). Robert with Chloé since 1990s (25+ years). Verification partial due to Lars's multiple marriages, though current marriage stable since joining this lineup."
+      }
+    ];
+
+    /* =========================
+       APPLICATION STATE
+       Single source of truth for all data and UI state
+    ========================== */
+    const STATE = {
+      entries: [],
+      filter: { 
+        verifiedOnly: false, 
+        partialOnly: false, 
+        highSovOnly: false, 
+        q: "" 
+      },
+      truthPoints: 0,
+      quest: null,
+      bootedAt: Date.now()
+    };
+
+    const KEYS = {
+      ENTRIES: "entries_v1",
+      TP: "truth_points_v1",
+      QUEST: "quest_v1",
+      HUDMIN: "hud_min_v1"
+    };
+
+    function nowYear(){
+      return new Date().getFullYear();
+    }
+
+    /* Normalize and validate entry data */
+    function normalizeEntry(e){
+      const id = Safe.stripCtl(e.id || "").toLowerCase() || 
+                ("id-" + Math.random().toString(16).slice(2));
+      const band = Safe.stripCtl(e.band || "Unknown");
+      const since = Safe.clampYear(e.since) ?? null;
+      const verification = String(e.verification || "partial").toLowerCase();
+      const verificationLevel = verification.includes("verif") ? "verified" : 
+                                verification.includes("partial") ? "partial" : "legacy";
+      const tags = Array.isArray(e.tags) 
+        ? e.tags.map(t=>Safe.stripCtl(t.toLowerCase())).filter(Boolean).slice(0,20) 
+        : [];
+      const sources = Array.isArray(e.sources) 
+        ? e.sources.map(u=>Safe.stripCtl(u)).filter(Safe.isUrl).slice(0,15) 
+        : [];
+      const status = ["active","concluded","hiatus"].includes(e.status) ? e.status : "active";
+      const note = Safe.stripCtl(e.note || "");
+      
+      // Normalize member data
+      const members = Array.isArray(e.members) ? e.members.map(m => ({
+        name: Safe.stripCtl(m.name || ""),
+        partner: Safe.stripCtl(m.partner || ""),
+        since: Safe.clampYear(m.since) ?? null,
+        status: Safe.stripCtl(m.status || "ongoing"),
+        note: Safe.stripCtl(m.note || "")
+      })).slice(0, 10) : [];
+      
+      // Normalize sovereignty scoring
+      const sov = e.sovereignty || {};
+      const sovereignty = {
+        creative: Safe.clampScore(sov.creative, 25),
+        financial: Safe.clampScore(sov.financial, 25),
+        distribution: Safe.clampScore(sov.distribution, 25),
+        narrative: Safe.clampScore(sov.narrative, 25),
+        total: 0,
+        level: "medium",
+        description: Safe.stripCtl(sov.description || "")
+      };
+      sovereignty.total = sovereignty.creative + sovereignty.financial + 
+                         sovereignty.distribution + sovereignty.narrative;
+      sovereignty.level = sovereignty.total >= 75 ? "high" : 
+                         sovereignty.total >= 50 ? "medium" : "low";
+      
+      return { 
+        id, band, since, status, verification: verificationLevel, 
+        tags, sources, note, members, sovereignty 
+      };
+    }
+
+    function entryYears(e){
+      if (!e.since) return null;
+      return Math.max(0, nowYear() - e.since);
+    }
+
+    /* Calculate truth points and update HUD */
+    function scoreTruthPoints(){
+      let tp = 0;
+      let verified = 0, partial = 0, legacy = 0, links = 0;
+      let totalSov = 0, sovCount = 0;
+      
+      for (const e of STATE.entries){
+        links += (e.sources?.length||0);
+        if (e.verification === "verified") verified++;
+        else if (e.verification === "partial") partial++;
+        else legacy++;
+
+        // Base points for entries
+        tp += (e.verification === "verified") ? 30 : 
+              (e.verification === "partial") ? 20 : 15;
+        tp += Math.min(40, (e.sources?.length||0) * 6);
+        
+        // Member tracking bonus
+        tp += Math.min(30, (e.members?.length||0) * 5);
+        
+        // Duration bonus (capped)
+        const yrs = entryYears(e);
+        if (yrs != null) tp += Math.min(25, Math.floor(yrs/5)*3);
+        
+        // Sovereignty bonus (quality over quantity)
+        if (e.sovereignty?.total > 0) {
+          tp += Math.floor(e.sovereignty.total / 8);
+          totalSov += e.sovereignty.total;
+          sovCount++;
+        }
+      }
+      
+      STATE.truthPoints = tp;
+      const avgSov = sovCount > 0 ? Math.round(totalSov / sovCount) : 0;
+      renderHud(verified, partial, links, avgSov);
+    }
+
+    function setFilter(part){
+      STATE.filter = { ...STATE.filter, ...part };
+      persistSoft();
+      render();
+    }
+
+    async function persistSoft(){
+      // Rate-limited persistence
+      if (!Safe.rate("persist", 250)) return;
+      await DB.set(KEYS.ENTRIES, STATE.entries);
+      await DB.set(KEYS.TP, STATE.truthPoints);
+      await DB.set(KEYS.QUEST, STATE.quest);
+    }
+
+    function textMatch(hay, needle){
+      return hay.toLowerCase().includes(needle.toLowerCase());
+    }
+
+    function matchesFilter(e){
+      if (STATE.filter.verifiedOnly && e.verification !== "verified") return false;
+      if (STATE.filter.partialOnly && e.verification !== "partial") return false;
+      if (STATE.filter.highSovOnly && (e.sovereignty?.total||0) < 75) return false;
+      
+      const q = (STATE.filter.q||"").trim();
+      if (!q) return true;
+      
+      const memberText = (e.members||[]).map(m => `${m.name} ${m.partner}`).join(" ");
+      const blob = [
+        e.band, e.note, (e.tags||[]).join(" "), String(e.since||""),
+        e.verification, e.sovereignty?.level||"", e.sovereignty?.description||"",
+        memberText
+      ].join(" • ");
+      
+      return textMatch(blob, q);
+    }
+
+    /* Render individual entry card with band and sovereignty display */
+    function renderEntry(e){
+      const yrs = entryYears(e);
+      const durationText = yrs != null ? `${yrs} years` : "duration unknown";
+      const verClass = e.verification === "verified" ? "good" : 
+                       e.verification === "partial" ? "warn" : "";
+      
+      const sov = e.sovereignty || { total: 0, level: "medium" };
+      const sovClass = sov.level === "high" ? "high" : 
+                       sov.level === "medium" ? "med" : "low";
+      
+      // Render tags
+      let tagsHtml = "";
+      if (e.tags && e.tags.length > 0) {
+        tagsHtml = `<div class="tags">${
+          e.tags.map(t => {
+            const cls = t.includes("verified") ? "good" : 
+                       t.includes("partial") ? "warn" : "";
+            return `<span class="tag ${cls}">${Safe.esc(t)}</span>`;
+          }).join("")
+        }</div>`;
+      }
+      
+      // Render sources
+      let srcHtml = "";
+      if (e.sources && e.sources.length > 0) {
+        srcHtml = e.sources.map(url => 
+          `<li><a href="${Safe.esc(url)}" target="_blank" rel="noopener noreferrer">${Safe.esc(url.slice(0,50))}${url.length>50?'...':''}</a></li>`
+        ).join("");
+      }
+      
+      // Render members
+      let membersHtml = "";
+      if (e.members && e.members.length > 0) {
+        membersHtml = `
+          <div class="memberList">
+            <h4>Band Members & Relationships</h4>
+            ${e.members.map(m => {
+              const sinceText = m.since ? `since ${m.since}` : "";
+              const yearsText = m.since ? `(${nowYear() - m.since} years)` : "";
+              const statusText = m.status === "deceased" ? "deceased" : "ongoing";
+              const noteText = m.note ? ` · ${Safe.esc(m.note)}` : "";
+              return `
+                <div class="member">
+                  <div class="name">${Safe.esc(m.name)}</div>
+                  <div class="relationship">
+                    Partner: ${Safe.esc(m.partner)} ${sinceText} 
+                    <span class="years">${yearsText}</span> 
+                    · ${statusText}${noteText}
+                  </div>
+                </div>
+              `;
+            }).join("")}
+          </div>
+        `;
+      }
+      
+      // Sovereignty display
+      const sovHtml = `
+        <div class="sovereignty">
+          <div class="sovHeader">
+            <div class="sovTitle">
+              🎯 Band Sovereignty Score
+            </div>
+            <div class="sovBadge">
+              ${sov.total}<span style="font-size:14px; font-weight:600; margin-left:4px;">/100</span>
+            </div>
+            <span class="sovLevel ${sovClass}">
+              ${sov.level.toUpperCase()}
+            </span>
+          </div>
+          
+          <div class="sovGrid">
+            <div class="sovMetric">
+              <div class="sovMetricLabel">Creative</div>
+              <div class="sovMetricValue">${sov.creative || 0}</div>
+              <div class="sovBar" style="--sov-percent:${(sov.creative||0)*4}%;"></div>
+            </div>
+            
+            <div class="sovMetric">
+              <div class="sovMetricLabel">Financial</div>
+              <div class="sovMetricValue">${sov.financial || 0}</div>
+              <div class="sovBar" style="--sov-percent:${(sov.financial||0)*4}%;"></div>
+            </div>
+            
+            <div class="sovMetric">
+              <div class="sovMetricLabel">Distribution</div>
+              <div class="sovMetricValue">${sov.distribution || 0}</div>
+              <div class="sovBar" style="--sov-percent:${(sov.distribution||0)*4}%;"></div>
+            </div>
+            
+            <div class="sovMetric">
+              <div class="sovMetricLabel">Narrative</div>
+              <div class="sovMetricValue">${sov.narrative || 0}</div>
+              <div class="sovBar" style="--sov-percent:${(sov.narrative||0)*4}%;"></div>
+            </div>
+          </div>
+          
+          ${sov.description ? `<div class="sovDescription">${Safe.esc(sov.description)}</div>` : ''}
+        </div>
+      `;
+      
+      const noteHtml = e.note ? `<p class="smallNote">${Safe.esc(e.note)}</p>` : "";
+      
+      return `
+        <div class="entry">
+          <div class="entryTop">
+            <div class="name">${Safe.esc(e.band)}</div>
+            <div class="meta">
+              <span>Since ${e.since || "?"}</span>
+              <span>·</span>
+              <span>${durationText}</span>
+              <span>·</span>
+              <span>${e.status}</span>
+            </div>
+          </div>
+          
+          ${sovHtml}
+          ${membersHtml}
+          ${tagsHtml}
+          
+          <div class="entryDetails">
+            <b style="color:var(--accent); font-size:13px;">Verification</b>
+            <div style="margin-top:6px;">
+              <span class="tag ${verClass}">${e.verification.toUpperCase()}</span>
+            </div>
+            
+            <div style="margin-top:12px;">
+              <b style="color:var(--accent); font-size:13px;">
+                Sources (${(e.sources||[]).length})
+              </b>
+              <ul style="margin:6px 0; padding-left:18px; font-size:12px;">
+                ${srcHtml || "<li class='faint'>No sources yet (add reputable public links).</li>"}
+              </ul>
+            </div>
+            
+            ${noteHtml}
+          </div>
+        </div>
+      `;
+    }
+
+    /* Main render function */
+    function render(){
+      const list = document.getElementById("list");
+      const total = STATE.entries.length;
+      const shown = STATE.entries.filter(matchesFilter);
+      
+      document.getElementById("countTotal").textContent = total;
+      document.getElementById("countShown").textContent = shown.length;
+      
+      // Calculate average sovereignty for shown entries
+      const sovSum = shown.reduce((acc, e) => acc + (e.sovereignty?.total||0), 0);
+      const avgSov = shown.length > 0 ? Math.round(sovSum / shown.length) : 0;
+      document.getElementById("avgSov").textContent = avgSov;
+
+      // Sort: verified first, then by sovereignty score, then duration, then alphabetic
+      shown.sort((a,b)=>{
+        const verOrder = {verified: 0, partial: 1, legacy: 2};
+        const aVer = verOrder[a.verification] ?? 2;
+        const bVer = verOrder[b.verification] ?? 2;
+        if (aVer !== bVer) return aVer - bVer;
+        
+        const aSov = a.sovereignty?.total || 0;
+        const bSov = b.sovereignty?.total || 0;
+        if (aSov !== bSov) return bSov - aSov;
+        
+        const ay = entryYears(a) ?? -1;
+        const by = entryYears(b) ?? -1;
+        if (ay !== by) return by - ay;
+        
+        return a.band.localeCompare(b.band);
+      });
+
+      list.innerHTML = shown.map(renderEntry).join("") || `
+        <div class="entry">
+          <div class="entryTop">
+            <div class="name">No matches found</div>
+          </div>
+          <div class="smallNote">
+            Try a broader search or clear your filters. Search terms include: 
+            band names, members, genres, verification status, sovereignty levels.
+          </div>
+        </div>
+      `;
+
+      scoreTruthPoints();
+      drawConstellation();
+    }
+
+    /* Constellation visualizer (sovereignty-aware) */
+    function drawConstellation(){
+      const c = document.getElementById("constellation");
+      if (!c) return;
+      const ctx = c.getContext("2d");
+      const W = c.width, H = c.height;
+      ctx.clearRect(0,0,W,H);
+
+      const entries = STATE.entries;
+      const n = Math.min(30, entries.length || 1);
+      const seed = (STATE.truthPoints + entries.length*7) || 42;
+
+      // Deterministic PRNG (xorshift)
+      let x = seed | 0;
+      const rnd = () => {
+        x ^= x << 13; x ^= x >> 17; x ^= x << 5;
+        return ((x>>>0) % 10000) / 10000;
+      };
+
+      const nodes = [];
+      for (let i=0;i<n;i++){
+        const e = entries[i % entries.length] || {verification:"partial", sovereignty:{total:50}};
+        const vx = 40 + rnd()*(W-80);
+        const vy = 30 + rnd()*(H-60);
+        const w = (e.verification==="verified") ? 1.5 : 
+                  (e.verification==="partial") ? 1.2 : 1.0;
+        const sovWeight = (e.sovereignty?.total || 50) / 100;
+        nodes.push({x:vx, y:vy, w, sov:sovWeight});
+      }
+
+      // Draw connections (sovereignty influences color)
+      for (let i=0;i<nodes.length;i++){
+        for (let j=i+1;j<nodes.length;j++){
+          const a = nodes[i], b = nodes[j];
+          const dx = a.x-b.x, dy = a.y-b.y;
+          const d = Math.sqrt(dx*dx+dy*dy);
+          if (d < 140){
+            const avgSov = (a.sov + b.sov) / 2;
+            ctx.globalAlpha = Math.max(0, (140-d)/140) * 0.4;
+            ctx.lineWidth = 1;
+            
+            // Color based on sovereignty
+            if (avgSov > 0.75) {
+              ctx.strokeStyle = "rgba(16,185,129,1)";
+            } else if (avgSov > 0.5) {
+              ctx.strokeStyle = "rgba(245,158,11,1)";
+            } else {
+              ctx.strokeStyle = "rgba(125,211,252,1)";
+            }
+            
+            ctx.beginPath(); 
+            ctx.moveTo(a.x,a.y); 
+            ctx.lineTo(b.x,b.y); 
+            ctx.stroke();
+          }
+        }
+      }
+
+      // Draw nodes (size based on verification, color on sovereignty)
+      for (const p of nodes){
+        // Outer glow
+        ctx.globalAlpha = 0.35;
+        if (p.sov > 0.75) {
+          ctx.fillStyle = "rgba(16,185,129,1)";
+        } else if (p.sov > 0.5) {
+          ctx.fillStyle = "rgba(245,158,11,1)";
+        } else {
+          ctx.fillStyle = "rgba(125,211,252,1)";
+        }
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 9*p.w, 0, Math.PI*2);
+        ctx.fill();
+        
+        // Core node
+        ctx.globalAlpha = 0.95;
+        ctx.fillStyle = p.sov > 0.75 ? "rgba(16,185,129,1)" : 
+                        p.sov > 0.5 ? "rgba(245,158,11,1)" : 
+                        "rgba(196,181,253,1)";
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 2.8*p.w, 0, Math.PI*2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    /* Update HUD display */
+    function renderHud(verified, partial, links, avgSov){
+      document.getElementById("tp").textContent = STATE.truthPoints;
+      document.getElementById("ve").textContent = verified;
+      document.getElementById("pa").textContent = partial;
+      document.getElementById("sl").textContent = links;
+      document.getElementById("questText").textContent = STATE.quest?.text || "";
+    }
+
+    /* Micro-quest system */
+    function newQuest(){
+      const quests = [
+        "Add member relationship details to one entry → +25 TP boost.",
+        "Add sovereignty scores to one entry without them → +30 TP research boost.",
+        "Add a recent source to a LEGACY or PARTIAL entry → +20 TP boost.",
+        "Create a new band entry with complete member tracking → +40 TP boost.",
+        "Convert a PARTIAL entry to VERIFIED with additional documentation → +35 TP boost.",
+        "Research and document a band's label deal history → +30 TP boost."
+      ];
+      const pick = quests[Math.floor(Math.random()*quests.length)];
+      STATE.quest = { text: "Micro-Quest: " + pick, at: Date.now() };
+      persistSoft();
+      render();
+    }
+
+    /* Export/import functionality */
+    function exportJSON(){
+      const payload = JSON.stringify({ 
+        entries: STATE.entries, 
+        truthPoints: STATE.truthPoints, 
+        quest: STATE.quest,
+        version: 1
+      }, null, 2);
+      const blob = new Blob([payload], {type:"application/json"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `band-commitment-sovereignty-${Date.now()}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url), 1000);
+    }
+
+    function parseImport(txt){
+      const raw = Safe.stripCtl(txt);
+      if (!raw) return null;
+      let obj = null;
+      try { obj = JSON.parse(raw); } catch { return null; }
+      if (!obj || !Array.isArray(obj.entries)) return null;
+      const entries = obj.entries.map(normalizeEntry);
+      return { 
+        entries, 
+        truthPoints: Number(obj.truthPoints||0) || 0, 
+        quest: obj.quest||null 
+      };
+    }
+
+    async function mergeImport(pack){
+      const existing = new Map(STATE.entries.map(e=>[e.id,e]));
+      for (const e of pack.entries){
+        existing.set(e.id, e);
+      }
+      STATE.entries = Array.from(existing.values());
+      STATE.truthPoints = Math.max(STATE.truthPoints, pack.truthPoints||0);
+      if (pack.quest) STATE.quest = pack.quest;
+      await persistSoft();
+      render();
+    }
+
+    async function replaceImport(pack){
+      STATE.entries = pack.entries;
+      STATE.truthPoints = pack.truthPoints || 0;
+      STATE.quest = pack.quest || null;
+      await persistSoft();
+      render();
+    }
+
+    /* Parallax motion (respects reduced motion) */
+    function setupParallax(){
+      const reduce = window.matchMedia && 
+                     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (reduce) return;
+
+      const layers = Array.from(document.querySelectorAll(".layer"));
+      let targetX=0, targetY=0, curX=0, curY=0;
+
+      function onMove(ev){
+        const x = (ev.touches ? ev.touches[0].clientX : ev.clientX) || 
+                  window.innerWidth/2;
+        const y = (ev.touches ? ev.touches[0].clientY : ev.clientY) || 
+                  window.innerHeight/2;
+        targetX = (x / window.innerWidth - 0.5) * 2;
+        targetY = (y / window.innerHeight - 0.5) * 2;
+      }
+
+      function tick(){
+        curX += (targetX - curX) * 0.05;
+        curY += (targetY - curY) * 0.05;
+        for (const el of layers){
+          const d = Number(el.dataset.depth || 0.2);
+          const tx = curX * d * 20;
+          const ty = curY * d * 16;
+          el.style.transform = `translate3d(${tx}px, ${ty}px, 0)`;
+        }
+        requestAnimationFrame(tick);
+      }
+
+      window.addEventListener("mousemove", onMove, {passive:true});
+      window.addEventListener("touchmove", onMove, {passive:true});
+      tick();
+    }
+
+    /* Create animated background particles */
+    function createParticles(){
+      const container = document.getElementById("particles");
+      if (!container) return;
+      
+      const reduce = window.matchMedia && 
+                     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (reduce) return;
+      
+      const count = 40;
+      for (let i=0; i<count; i++){
+        const p = document.createElement("div");
+        p.className = "particle";
+        p.style.left = `${Math.random()*100}%`;
+        p.style.top = `${Math.random()*100}%`;
+        p.style.animationDelay = `${Math.random()*20}s`;
+        p.style.animationDuration = `${15 + Math.random()*10}s`;
+        container.appendChild(p);
+      }
+    }
+
+    /* Update sovereignty total in add form */
+    function updateSovTotal(){
+      const creative = Number(document.getElementById("addSovCreative").value) || 0;
+      const financial = Number(document.getElementById("addSovFinancial").value) || 0;
+      const distribution = Number(document.getElementById("addSovDistribution").value) || 0;
+      const narrative = Number(document.getElementById("addSovNarrative").value) || 0;
+      
+      document.getElementById("sovCreativeVal").textContent = creative;
+      document.getElementById("sovFinancialVal").textContent = financial;
+      document.getElementById("sovDistributionVal").textContent = distribution;
+      document.getElementById("sovNarrativeVal").textContent = narrative;
+      
+      const total = creative + financial + distribution + narrative;
+      document.getElementById("sovTotal").textContent = total;
+    }
+
+    /* Parse member list from textarea */
+    function parseMemberList(text){
+      const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
+      return lines.map(line => {
+        // Format: "Name - Partner - Since Year"
+        const parts = line.split("-").map(p => p.trim());
+        if (parts.length < 2) return null;
+        
+        const name = parts[0];
+        const partner = parts[1];
+        const sinceStr = parts[2] || "";
+        const since = Safe.clampYear(sinceStr);
+        
+        return { name, partner, since, status: "ongoing", note: "" };
+      }).filter(Boolean);
+    }
+
+    /* Boot sequence */
+    async function boot(){
+      setupParallax();
+      createParticles();
+
+      const splash = document.getElementById("splash");
+      const splashMsg = document.getElementById("splashMsg");
+      
+      try {
+        splashMsg.textContent = "Loading local data from IndexedDB...";
+        
+        // Load persisted data
+        const savedEntries = await DB.get(KEYS.ENTRIES);
+        const savedTP = await DB.get(KEYS.TP);
+        const savedQuest = await DB.get(KEYS.QUEST);
+        const hudMin = await DB.get(KEYS.HUDMIN);
+        
+        splashMsg.textContent = "Validating dataset and sovereignty scores...";
+        
+        if (Array.isArray(savedEntries) && savedEntries.length > 0) {
+          STATE.entries = savedEntries.map(normalizeEntry);
+        } else {
+          STATE.entries = SEED.map(normalizeEntry);
+        }
+        
+        STATE.truthPoints = Number(savedTP) || 0;
+        STATE.quest = savedQuest || null;
+        
+        if (hudMin) {
+          document.getElementById("hud").classList.add("minimized");
+        }
+        
+        splashMsg.textContent = "Rendering interface and calculating metrics...";
+        
+        // Wire up UI events
+        document.getElementById("q").addEventListener("input", (ev)=>{
+          setFilter({ q: ev.target.value });
+        });
+        
+        document.getElementById("btnOnlyVerified").addEventListener("click", ()=>{
+          setFilter({ verifiedOnly: true, partialOnly: false, highSovOnly: false });
+        });
+        
+        document.getElementById("btnOnlyPartial").addEventListener("click", ()=>{
+          setFilter({ verifiedOnly: false, partialOnly: true, highSovOnly: false });
+        });
+        
+        document.getElementById("btnHighSov").addEventListener("click", ()=>{
+          setFilter({ verifiedOnly: false, partialOnly: false, highSovOnly: true });
+        });
+        
+        document.getElementById("btnClearFilters").addEventListener("click", ()=>{
+          document.getElementById("q").value = "";
+          setFilter({ verifiedOnly: false, partialOnly: false, highSovOnly: false, q: "" });
+        });
+        
+        document.getElementById("btnExport").addEventListener("click", exportJSON);
+        
+        document.getElementById("btnReset").addEventListener("click", async ()=>{
+          if (!confirm("Reset all local data? This will restore the seed dataset and clear your additions.")) return;
+          STATE.entries = SEED.map(normalizeEntry);
+          STATE.truthPoints = 0;
+          STATE.quest = null;
+          await DB.del(KEYS.ENTRIES);
+          await DB.del(KEYS.TP);
+          await DB.del(KEYS.QUEST);
+          render();
+        });
+        
+        document.getElementById("btnQuest").addEventListener("click", newQuest);
+        
+        document.getElementById("btnHudHelp").addEventListener("click", ()=>{
+          alert("HUD Metrics:\n\n" +
+                "Truth Points: Earned by adding verified bands, sources, member data, and sovereignty info.\n\n" +
+                "Verified/Partial: Entry verification status. Verified = all members documented with recent sources. Partial = core members verified.\n\n" +
+                "Sources: Total reputable source links across all entries.\n\n" +
+                "Constellation: Visual representation of dataset. Node colors reflect sovereignty levels:\n" +
+                "- Green: High sovereignty (75+)\n" +
+                "- Orange: Medium sovereignty (50-74)\n" +
+                "- Blue: Developing sovereignty (0-49)\n\n" +
+                "Node size reflects verification level (larger = more verified).\n\n" +
+                "Micro-Quests suggest quality improvements for dataset enhancement.");
+        });
+        
+        const hudMinBtn = document.getElementById("hudMin");
+        hudMinBtn.addEventListener("click", async ()=>{
+          const hud = document.getElementById("hud");
+          hud.classList.toggle("minimized");
+          await DB.set(KEYS.HUDMIN, hud.classList.contains("minimized"));
+        });
+        
+        // Add form sovereignty sliders
+        ["Creative", "Financial", "Distribution", "Narrative"].forEach(type => {
+          const el = document.getElementById(`addSov${type}`);
+          if (el) el.addEventListener("input", updateSovTotal);
+        });
+        
+        // Add form submission
+        document.getElementById("addForm").addEventListener("submit", async (ev)=>{
+          ev.preventDefault();
+          
+          if (!Safe.rate("addEntry", 1000)) {
+            alert("Please wait a moment before adding another entry.");
+            return;
+          }
+          
+          const band = document.getElementById("addBand").value;
+          const since = document.getElementById("addSince").value;
+          const verification = document.getElementById("addVerification").value;
+          const tagsRaw = document.getElementById("addTags").value;
+          const membersRaw = document.getElementById("addMembers").value;
+          const sourcesRaw = document.getElementById("addSources").value;
+          const note = document.getElementById("addNote").value;
+          
+          const sovCreative = Number(document.getElementById("addSovCreative").value);
+          const sovFinancial = Number(document.getElementById("addSovFinancial").value);
+          const sovDistribution = Number(document.getElementById("addSovDistribution").value);
+          const sovNarrative = Number(document.getElementById("addSovNarrative").value);
+          
+          const tags = tagsRaw.split(",").map(t=>t.trim().toLowerCase()).filter(Boolean);
+          const members = parseMemberList(membersRaw);
+          const sources = sourcesRaw.split("\n").map(u=>u.trim()).filter(Boolean);
+          
+          const entry = normalizeEntry({
+            id: `custom-${Date.now()}`,
+            band,
+            since: Number(since),
+            status: "active",
+            verification,
+            tags,
+            members,
+            sources,
+            note,
+            sovereignty: {
+              creative: sovCreative,
+              financial: sovFinancial,
+              distribution: sovDistribution,
+              narrative: sovNarrative,
+              description: ""
+            }
+          });
+          
+          STATE.entries.push(entry);
+          STATE.truthPoints += 30;
+          await persistSoft();
+          render();
+          
+          ev.target.reset();
+          updateSovTotal();
+          alert("Band entry added successfully! +30 Truth Points");
+        });
+        
+        // Import functionality
+        document.getElementById("btnMergeImport").addEventListener("click", async ()=>{
+          const file = document.getElementById("importFile").files[0];
+          if (!file) {
+            alert("Please select a JSON file first.");
+            return;
+          }
+          
+          const txt = await file.text();
+          const pack = parseImport(txt);
+          if (!pack) {
+            alert("Invalid file format. Please select a valid JSON export.");
+            return;
+          }
+          
+          await mergeImport(pack);
+          alert(`Merged ${pack.entries.length} band entries successfully!`);
+          document.getElementById("importFile").value = "";
+        });
+        
+        document.getElementById("btnReplaceImport").addEventListener("click", async ()=>{
+          const file = document.getElementById("importFile").files[0];
+          if (!file) {
+            alert("Please select a JSON file first.");
+            return;
+          }
+          
+          if (!confirm("Replace ALL local data with imported file? This cannot be undone.")) {
+            return;
+          }
+          
+          const txt = await file.text();
+          const pack = parseImport(txt);
+          if (!pack) {
+            alert("Invalid file format. Please select a valid JSON export.");
+            return;
+          }
+          
+          await replaceImport(pack);
+          alert("Data replaced successfully!");
+          document.getElementById("importFile").value = "";
+        });
+        
+        // Initial render
+        splashMsg.textContent = "Finalizing...";
+        render();
+        
+        // Hide splash
+        setTimeout(()=>{
+          splash.classList.add("hidden");
+          setTimeout(()=>splash.remove(), 500);
+        }, 1200);
+        
+      } catch (err) {
+        console.error("Boot error:", err);
+        splashMsg.textContent = "Error loading data. Check console.";
+      }
+    }
+
+    // Initialize on DOM ready
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", boot);
+    } else {
+      boot();
+    }
+  </script>
+</body>
+</html>
